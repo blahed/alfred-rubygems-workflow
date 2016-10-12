@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>blahed.rubygems.com</string>
+	<key>category</key>
+	<string>Internet</string>
+	<key>connections</key>
+	<dict>
+		<key>6269606E-2F74-4F0C-9F83-597388B5633B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>9769B025-9FB6-452E-907D-CF538F96B598</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>6EB30206-C77B-46E8-84B3-C48A44AAC850</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1DDD7109-8EE4-4720-829C-5C82DB7DB787</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Travis Dunn</string>
+	<key>description</key>
+	<string>Various rubygems treats</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>rubygems</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>plusspaces</key>
+				<false/>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>1DDD7109-8EE4-4720-829C-5C82DB7DB787</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>gems</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>2</integer>
+				<key>runningsubtext</key>
+				<string>...</string>
+				<key>script</key>
+				<string>require 'open-uri'
+require 'json'
+
+response = open('https://rubygems.org/api/v1/search.json?query={query}')
+gems     = JSON.parse(response.read, symbolize_names: true)
+
+
+def item_xml(gem)
+  url  = gem[:project_uri]
+  name = gem[:name]
+
+  &lt;&lt;-ITEM_XML
+    &lt;item uid="#{name}" arg="#{url}" autocomplete="#{name}"&gt;
+      &lt;title&gt;#{name}&lt;/title&gt;
+      &lt;subtitle&gt;Latest Version: #{gem[:version]}  Info: #{gem[:info]}&lt;/subtitle&gt;
+    &lt;/item&gt;
+  ITEM_XML
+end
+
+puts &lt;&lt;-XML
+&lt;?xml version="1.0"?&gt;
+&lt;items&gt;
+  #{gems.map {|g| item_xml(g) }.join("\n")}
+&lt;/items&gt;
+XML</string>
+				<key>subtext</key>
+				<string>Search rubygems.org</string>
+				<key>title</key>
+				<string>Type the gem name</string>
+				<key>type</key>
+				<integer>2</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>6EB30206-C77B-46E8-84B3-C48A44AAC850</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>63</integer>
+				<key>keyword</key>
+				<string>gem</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<false/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>2</integer>
+				<key>runningsubtext</key>
+				<string>...</string>
+				<key>script</key>
+				<string>require 'open-uri'
+require 'json'
+
+response = open('https://rubygems.org/api/v1/gems/{query}.json')
+gem      = JSON.parse(response.read, symbolize_names: true)
+
+url     = gem[:project_uri]
+name    = gem[:name]
+version = gem[:version]
+
+puts &lt;&lt;-XML
+&lt;?xml version="1.0"?&gt;
+&lt;items&gt;
+  &lt;item uid="#{name}" arg="#{url}" autocomplete="#{name}"&gt;
+    &lt;title&gt;#{name}&lt;/title&gt;
+    &lt;subtitle&gt;Latest Version: #{version}  Info: #{gem[:info]}&lt;/subtitle&gt;
+    &lt;text type="copy"&gt;gem '#{name}', '~&gt; #{version}'&lt;/text&gt;
+    &lt;text type="largetype"&gt;#{version}&lt;/text&gt;
+  &lt;/item&gt;
+&lt;/items&gt;
+XML
+</string>
+				<key>subtext</key>
+				<string>Get gem details from rubygems</string>
+				<key>title</key>
+				<string>Type the gem name</string>
+				<key>type</key>
+				<integer>2</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>6269606E-2F74-4F0C-9F83-597388B5633B</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>plusspaces</key>
+				<false/>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>9769B025-9FB6-452E-907D-CF538F96B598</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>1DDD7109-8EE4-4720-829C-5C82DB7DB787</key>
+		<dict>
+			<key>ypos</key>
+			<real>10</real>
+		</dict>
+		<key>6269606E-2F74-4F0C-9F83-597388B5633B</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+		<key>6EB30206-C77B-46E8-84B3-C48A44AAC850</key>
+		<dict>
+			<key>ypos</key>
+			<real>10</real>
+		</dict>
+		<key>9769B025-9FB6-452E-907D-CF538F96B598</key>
+		<dict>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+	</dict>
+	<key>webaddress</key>
+	<string>trvsdnn.com</string>
+</dict>
+</plist>
